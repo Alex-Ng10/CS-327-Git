@@ -9,8 +9,8 @@
 
 public class Matrix {
   
-  private int m, n;
-  private double[][] M;
+  private int m, n; // Number of rows and columns
+  private double[][] M; // 2D array to store matrix values
   
   public Matrix(double[][] array) {
     M = array;
@@ -21,20 +21,24 @@ public class Matrix {
   /**
    * @return The number of columns in the matrix. 
    */
-  public int nCols() { return 0; }
+  public int nCols() {
+    return n; // Return the number of columns
+  }
   
   /** 
    * @return the number of rows.
    */ 
-  public int nRows() { return 0; }
+  public int nRows() {
+    return m; // Return the number of rows
+  }
   
   /** 
    * @param i 
    * @param j
    * @return The entry at row i column j. 
    */
-  public double entry(int i, int j) { 
-    return 0;
+  public double entry(int i, int j) {
+    return M[i][j]; // Return the value at row i, column j
   }
   
   /**
@@ -45,7 +49,18 @@ public class Matrix {
    * @return The dot product of this matrix with that. 
    */
   public Matrix dot(Matrix that) throws UndefinedMatrixOpException {
-    return null;
+    if (this.nCols() != that.nRows()) {
+        throw new UndefinedMatrixOpException("Matrix dimensions do not match for dot product", this, that);
+    }
+    double[][] result = new double[this.nRows()][that.nCols()];
+    for (int i = 0; i < this.nRows(); i++) {
+        for (int j = 0; j < that.nCols(); j++) {
+            for (int k = 0; k < this.nCols(); k++) {
+                result[i][j] += this.entry(i, k) * that.entry(k, j);
+            }
+        }
+    }
+    return new Matrix(result);
   }
   
   /**
@@ -55,7 +70,16 @@ public class Matrix {
    * @return The sum of the this and that. 
    */
    public Matrix plus(Matrix that) throws UndefinedMatrixOpException {
-     return null;
+     if (this.nRows() != that.nRows() || this.nCols() != that.nCols()) {
+         throw new UndefinedMatrixOpException("Matrix dimensions do not match for addition", this, that);
+     }
+     double[][] result = new double[this.nRows()][this.nCols()];
+     for (int i = 0; i < this.nRows(); i++) {
+         for (int j = 0; j < this.nCols(); j++) {
+             result[i][j] = this.entry(i, j) + that.entry(i, j);
+         }
+     }
+     return new Matrix(result);
    }
    
    /**
@@ -63,7 +87,11 @@ public class Matrix {
     * @return The homogeneous rotation matrix for a given value for theta. 
     */ 
    public static Matrix rotationH2D(double theta) {
-     double[][] R = {{Math.cos(theta), -Math.sin(theta), 0}, {Math.sin(theta), Math.cos(theta), 0}, {0, 0, 1}};
+     double[][] R = {
+         {Math.cos(theta), -Math.sin(theta), 0}, 
+         {Math.sin(theta), Math.cos(theta), 0}, 
+         {0, 0, 1}
+     };
      return new Matrix(R);
    }
    
@@ -73,7 +101,12 @@ public class Matrix {
     * @return The matrix representing a translation of tx, ty. 
     */
    public static Matrix translationH2D(double tx, double ty) {
-     return null;
+     double[][] T = {
+         {1, 0, tx},
+         {0, 1, ty},
+         {0, 0, 1}
+     };
+     return new Matrix(T);
    }
    
    /**
@@ -82,7 +115,12 @@ public class Matrix {
     * @return The column matrix representing in homogeneous coordinates the point (x, y). 
     */
    public static Matrix vectorH2D(double x, double y) {
-     return null;
+     double[][] V = {
+         {x},
+         {y},
+         {1}
+     };
+     return new Matrix(V);
    }
    
    /** 
@@ -90,7 +128,11 @@ public class Matrix {
     * @return the nxn identity matrix
     */
    public static Matrix identity(int n) {
-     return null;
+     double[][] I = new double[n][n];
+     for (int i = 0; i < n; i++) {
+         I[i][i] = 1; // Set diagonal elements to 1
+     }
+     return new Matrix(I);
    }
    
    /**
@@ -101,7 +143,11 @@ public class Matrix {
     * @return the mxn identity matrix. 
     */
     public static Matrix identity(int m, int n) {
-      return null;
+      double[][] I = new double[m][n];
+      for (int i = 0; i < Math.min(m, n); i++) {
+          I[i][i] = 1; // Set diagonal elements to 1
+      }
+      return new Matrix(I);
     }
     
     /** 
@@ -117,5 +163,15 @@ public class Matrix {
         sb.append('\n');
       }
       return sb.toString();
+    }
+    
+    public Matrix getMatrix() throws UndefinedMatrixOpException {
+        if (parent == null) {
+            return Matrix.identity(3); // Root node
+        }
+        Matrix rotation = Matrix.rotationH2D(orbitAngle); // Orbital rotation
+        Matrix translation = Matrix.translationH2D(orbitRadius, 0); // Orbital translation
+        Matrix selfRotation = Matrix.rotationH2D(selfRotationAngle); // Self-rotation
+        return parent.getMatrix().dot(translation).dot(rotation).dot(selfRotation);
     }
 }

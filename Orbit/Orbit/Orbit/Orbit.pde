@@ -70,22 +70,32 @@ void draw() {
 }
 
 void updateOrbiters(double timeDelta) {
-  
+    
   // TODO
   // This code should traverse the orbiters (in BFS or DFS, but I used BFS) 
   // order using a stack or a queue (your choice),  and call updateRotation 
   // on each one using the timeDelta parameter. 
   //
   // Recall that Java has a Queue<T> data type and a Stack<T> interface
-  
+
+  Queue<Orbiter> queue = new LinkedList<>();
+    queue.add(sun); // Start with the root orbiter
+    while (!queue.isEmpty()) {
+        Orbiter current = queue.poll();
+        current.updateRotation(timeDelta);
+        queue.addAll(current.getChildren());
+    }
 }
 
 void drawOrbiters() {
   
-  // TODO
-  // This code should traverse the orbiters (in BFS or DFS order, i used BFS)
-  // and call drawOrbiter on each orbiter. 
-  
+  Queue<Orbiter> queue = new LinkedList<>();
+    queue.add(sun); // Start with the root orbiter
+    while (!queue.isEmpty()) {
+        Orbiter current = queue.poll();
+        drawOrbiter(current);
+        queue.addAll(current.getChildren());
+    }
 }
 
 // The code for drawing an orbiter. This is called from your drawOrbiters() method
