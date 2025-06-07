@@ -10,7 +10,7 @@ Matrix origin = new Matrix(originM);
 boolean clearBackground = true; 
 double speedModifier = 1.0; // Set in some of the scenes to change the speed. 
 
-// One default scene (selected in the setup() function
+// One default scene (selected in the setup() function)
 void setupScene1() {
   
   sun = new Orbiter(null, 0, 0, 0, Orbiter.Type.CIRCLE, Color.yellow); 

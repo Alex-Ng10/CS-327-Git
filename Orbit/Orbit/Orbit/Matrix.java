@@ -164,14 +164,4 @@ public class Matrix {
       }
       return sb.toString();
     }
-    
-    public Matrix getMatrix() throws UndefinedMatrixOpException {
-        if (parent == null) {
-            return Matrix.identity(3); // Root node
-        }
-        Matrix rotation = Matrix.rotationH2D(orbitAngle); // Orbital rotation
-        Matrix translation = Matrix.translationH2D(orbitRadius, 0); // Orbital translation
-        Matrix selfRotation = Matrix.rotationH2D(selfRotationAngle); // Self-rotation
-        return parent.getMatrix().dot(translation).dot(rotation).dot(selfRotation);
-    }
 }
